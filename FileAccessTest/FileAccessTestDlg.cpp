@@ -124,7 +124,7 @@ void CFileAccessTestDlg::OnBnClickedButtonOpen()
 	m_filePath.Empty();
 	m_editPath.GetWindowTextW ( m_filePath );
 
-	// オープンの仕方を指定します(読み取り専用)
+	// オープンの仕方を指定
 	UINT nOpenFlags = CFile::modeReadWrite | CFile::modeNoTruncate | CStdioFile::modeCreate;
 	CStdioFile ifp;
 	try
@@ -135,6 +135,8 @@ void CFileAccessTestDlg::OnBnClickedButtonOpen()
 			m_open.EnableWindow( FALSE );
 			m_close.EnableWindow( TRUE );
 			m_write.EnableWindow ( TRUE );
+
+			// ファイルの最後の位置へSeek
 			m_fileHandle.SeekToEnd();
 		}
 	}
