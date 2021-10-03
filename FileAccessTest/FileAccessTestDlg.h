@@ -49,4 +49,15 @@ public:
 	private:
 	CEdit m_editWriteText;
 	CButton m_write;
+	public:
+	afx_msg void OnBnClickedButtonPathRename ();
+	private:
+	CEdit m_editPathRename;
+	CButton m_copy;
+	CButton m_rename;
+	public:
+	CButton m_delete;
+	afx_msg void OnBnClickedButtonCopy ();
+	afx_msg void OnBnClickedButtonDelete ();
+	afx_msg void OnBnClickedButtonRename ();
 };

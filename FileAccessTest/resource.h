@@ -10,8 +10,11 @@
 #define IDC_BUTTON_OPEN                 1003
 #define IDC_BUTTON_CLOSE                1004
 #define IDC_BUTTON_WRITE                1007
-#define IDC_EDIT3                       1010
+#define IDC_BUTTON_PATH_RENAME          1008
 #define IDC_EDIT_WRITETEXT              1010
+#define IDC_BUTTON_COPY                 1011
+#define IDC_BUTTON_RENAME               1012
+#define IDC_BUTTON_DELETE               1013
 
 // Next default values for new objects
 // 
@@ -19,7 +22,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        130
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1011
+#define _APS_NEXT_CONTROL_VALUE         1014
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

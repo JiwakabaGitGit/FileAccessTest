@@ -31,6 +31,9 @@ void CFileAccessTestDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control ( pDX, IDC_BUTTON_CLOSE, m_close );
 	DDX_Control ( pDX, IDC_EDIT_WRITETEXT, m_editWriteText );
 	DDX_Control ( pDX, IDC_BUTTON_WRITE, m_write );
+	DDX_Control ( pDX, IDC_BUTTON_COPY, m_copy );
+	DDX_Control ( pDX, IDC_BUTTON_RENAME, m_rename );
+	DDX_Control ( pDX, IDC_BUTTON_DELETE, m_delete );
 }
 
 BEGIN_MESSAGE_MAP(CFileAccessTestDlg, CDialogEx)
@@ -40,6 +43,10 @@ BEGIN_MESSAGE_MAP(CFileAccessTestDlg, CDialogEx)
 	ON_BN_CLICKED ( IDC_BUTTON_OPEN, &CFileAccessTestDlg::OnBnClickedButtonOpen )
 	ON_BN_CLICKED ( IDC_BUTTON_CLOSE, &CFileAccessTestDlg::OnBnClickedButtonClose )
 	ON_BN_CLICKED ( IDC_BUTTON_WRITE, &CFileAccessTestDlg::OnBnClickedButtonWrite )
+	ON_BN_CLICKED ( IDC_BUTTON_PATH_RENAME, &CFileAccessTestDlg::OnBnClickedButtonPathRename )
+	ON_BN_CLICKED ( IDC_BUTTON_COPY, &CFileAccessTestDlg::OnBnClickedButtonCopy )
+	ON_BN_CLICKED ( IDC_BUTTON_DELETE, &CFileAccessTestDlg::OnBnClickedButtonDelete )
+	ON_BN_CLICKED ( IDC_BUTTON_RENAME, &CFileAccessTestDlg::OnBnClickedButtonRename )
 END_MESSAGE_MAP()
 
 
@@ -117,12 +124,18 @@ void CFileAccessTestDlg::OnBnClickedPath()
 	GetOpenFileName ( &openFilename );
 
 	m_editPath.SetWindowTextW( szFile );
+
+	m_filePath.Empty ();
+	m_editPath.GetWindowTextW ( m_filePath );
 }
 
 void CFileAccessTestDlg::OnBnClickedButtonOpen()
 {
-	m_filePath.Empty();
-	m_editPath.GetWindowTextW ( m_filePath );
+	if ( m_filePath.GetLength () <= 0 )
+	{
+		// パス指定なし
+		return;
+	}
 
 	// オープンの仕方を指定
 	UINT nOpenFlags = CFile::modeReadWrite | CFile::modeNoTruncate | CStdioFile::modeCreate;
@@ -166,4 +179,105 @@ void CFileAccessTestDlg::OnBnClickedButtonWrite()
 	m_fileHandle.WriteString( writeText );
 	m_fileHandle.Write ( ( "\r\n" ), 2 );
 	m_fileHandle.Flush();
+}
+
+
+void CFileAccessTestDlg::OnBnClickedButtonPathRename()
+{
+	// TODO: ここにコントロール通知ハンドラー コードを追加します。
+	TCHAR szFile[ MAX_PATH * 256 ];
+	int sz = sizeof ( szFile ) / sizeof ( TCHAR );
+	OPENFILENAME openFilename;
+	szFile[ 0 ] = _T ( '\0' );
+	ZeroMemory ( &openFilename, sizeof ( openFilename ) );
+	openFilename.lStructSize = sizeof ( openFilename );      // 構造体サイズ
+	openFilename.hwndOwner = 0;								// 親ウィンドウのハンドル
+	openFilename.lpstrInitialDir = _TEXT ( "C:\\" );		// 初期フォルダー
+	openFilename.lpstrFile = szFile;						// 取得したファイル名を保存するバッファ
+	openFilename.nMaxFile = sz;                             // 取得したファイル名を保存するバッファサイズ
+	openFilename.lpstrFilter = FILE_EXT_ALL;
+	openFilename.lpstrDefExt = FILE_EXT;
+	openFilename.lpstrTitle = _TEXT ( "ファイルPATHを指定" );
+	openFilename.nFilterIndex = 1;
+	GetOpenFileName ( &openFilename );
+
+	m_editPathRename.SetWindowTextW ( szFile );
+}
+
+
+void CFileAccessTestDlg::OnBnClickedButtonCopy()
+{
+	TCHAR szFile[ MAX_PATH * 256 ];
+	int sz = sizeof ( szFile ) / sizeof ( TCHAR );
+	OPENFILENAME openFilename;
+	szFile[ 0 ] = _T ( '\0' );
+	ZeroMemory ( &openFilename, sizeof ( openFilename ) );
+	openFilename.lStructSize = sizeof ( openFilename );      // 構造体サイズ
+	openFilename.hwndOwner = 0;								// 親ウィンドウのハンドル
+	openFilename.lpstrInitialDir = _TEXT ( "C:\\" );		// 初期フォルダー
+	openFilename.lpstrFile = szFile;						// 取得したファイル名を保存するバッファ
+	openFilename.nMaxFile = sz;                             // 取得したファイル名を保存するバッファサイズ
+	openFilename.lpstrFilter = FILE_EXT_ALL;
+	openFilename.lpstrDefExt = FILE_EXT;
+	openFilename.lpstrTitle = _TEXT ( "コピー元のファイルPATHを指定" );
+	openFilename.nFilterIndex = 1;
+	GetOpenFileName ( &openFilename );
+
+	CopyFile( szFile, m_filePath, FALSE );
+}
+
+
+void CFileAccessTestDlg::OnBnClickedButtonDelete()
+{
+	CFileFind find;
+
+	if ( m_filePath.GetLength() <= 0 )
+	{
+		// パス指定なし
+		return;
+	}
+
+	if ( find.FindFile( m_filePath ) == FALSE )
+	{
+		// ファイルが存在しない場合
+		return;
+	}
+
+	DeleteFile( m_filePath );
+}
+
+
+void CFileAccessTestDlg::OnBnClickedButtonRename()
+{
+	CFileFind find;
+
+	if ( m_filePath.GetLength() <= 0 )
+	{
+		// パス指定なし
+		return;
+	}
+
+	if ( find.FindFile( m_filePath ) == FALSE )
+	{
+		// ファイルが存在しない場合
+		return;
+	}
+
+	TCHAR szFile[ MAX_PATH * 256 ];
+	int sz = sizeof ( szFile ) / sizeof ( TCHAR );
+	OPENFILENAME openFilename;
+	szFile[ 0 ] = _T ( '\0' );
+	ZeroMemory ( &openFilename, sizeof ( openFilename ) );
+	openFilename.lStructSize = sizeof ( openFilename );      // 構造体サイズ
+	openFilename.hwndOwner = 0;								// 親ウィンドウのハンドル
+	openFilename.lpstrInitialDir = _TEXT ( "C:\\" );		// 初期フォルダー
+	openFilename.lpstrFile = szFile;						// 取得したファイル名を保存するバッファ
+	openFilename.nMaxFile = sz;                             // 取得したファイル名を保存するバッファサイズ
+	openFilename.lpstrFilter = FILE_EXT_ALL;
+	openFilename.lpstrDefExt = FILE_EXT;
+	openFilename.lpstrTitle = _TEXT ( "リネーム先のPATHを指定" );
+	openFilename.nFilterIndex = 1;
+	GetOpenFileName ( &openFilename );
+
+	MoveFile ( m_filePath, szFile );
 }
